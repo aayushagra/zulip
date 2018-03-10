@@ -213,6 +213,7 @@ var bugdown_data = JSON.parse(fs.readFileSync(path.join(__dirname, '../../zerver
         {input: 'hello', expected: '<p>hello</p>'},
         {input: 'hello there', expected: '<p>hello there</p>'},
         {input: 'hello **bold** for you', expected: '<p>hello <strong>bold</strong> for you</p>'},
+        {input: 'hello ***foo*** for you', expected: '<p>hello <strong><em>foo</em></strong> for you</p>'},
         {input: '__hello__', expected: '<p>__hello__</p>'},
         {input: '\n```\nfenced code\n```\n\nand then after\n',
          expected: '<div class="codehilite"><pre><span></span>fenced code\n</pre></div>\n\n\n<p>and then after</p>'},
@@ -368,9 +369,19 @@ var bugdown_data = JSON.parse(fs.readFileSync(path.join(__dirname, '../../zerver
     input = "test @all";
     message = {subject: "No links here", raw_content: input};
     markdown.apply_markdown(message);
-    assert.equal(message.mentioned, true);
+    assert.equal(message.mentioned, false);
+
+    input = "test @everyone";
+    message = {subject: "No links here", raw_content: input};
+    markdown.apply_markdown(message);
+    assert.equal(message.mentioned, false);
 
     input = "test @any";
+    message = {subject: "No links here", raw_content: input};
+    markdown.apply_markdown(message);
+    assert.equal(message.mentioned, false);
+
+    input = "test @alleycat.com";
     message = {subject: "No links here", raw_content: input};
     markdown.apply_markdown(message);
     assert.equal(message.mentioned, false);
@@ -381,6 +392,11 @@ var bugdown_data = JSON.parse(fs.readFileSync(path.join(__dirname, '../../zerver
     assert.equal(message.mentioned, true);
 
     input = "test @*backend*";
+    message = {subject: "No links here", raw_content: input};
+    markdown.apply_markdown(message);
+    assert.equal(message.mentioned, false);
+
+    input = "test @**invalid_user**";
     message = {subject: "No links here", raw_content: input};
     markdown.apply_markdown(message);
     assert.equal(message.mentioned, false);

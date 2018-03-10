@@ -401,6 +401,11 @@ function render(template_name, args) {
 
 }());
 
+(function all_messages_sidebar_actions() {
+    var html = render('all_messages_sidebar_actions');
+    global.write_handlebars_output("all_messages_sidebar_actions", html);
+}());
+
 (function announce_stream_docs() {
     var html = render('announce_stream_docs');
     global.write_handlebars_output("announce_stream_docs", html);
@@ -1343,6 +1348,53 @@ function render(template_name, args) {
     var li = $(html).find('li:first');
     assert.equal(li.text(), 'Hamlet is typing...');
 
+}());
+
+(function user_group_info_popover() {
+    var html = render('user_group_info_popover');
+    global.write_handlebars_output("user_group_info_popover", html);
+
+    $(html).hasClass('popover message-info-popover group-info-popover');
+}());
+
+(function user_group_info_popover_content() {
+    var args = {
+        group_name: 'groupName',
+        group_description: 'groupDescription',
+        members: [
+            {
+                presence_status: 'active',
+                full_name: 'Active Alice',
+                user_last_seen_time_status: 'time',
+                is_bot: false,
+            },
+            {
+                presence_status: 'offline',
+                full_name: 'Bot Bob',
+                user_last_seen_time_status: 'time',
+                is_bot: true,
+            },
+            {
+                presence_status: 'offline',
+                full_name: 'Inactive Imogen',
+                user_last_seen_time_status: 'time',
+                is_bot: false,
+            },
+        ],
+    };
+
+    var html = render('user_group_info_popover_content', args);
+    global.write_handlebars_output("user_group_info_popover_content", html);
+
+    var allUsers = $(html).find("li");
+    assert.equal(allUsers[0].classList.contains("user_active"), true);
+    assert.equal(allUsers[2].classList.contains("user_offline"), true);
+    assert.equal($(allUsers[0]).text().trim(), 'Active Alice');
+    assert.equal($(allUsers[1]).text().trim(), 'Bot Bob');
+    assert.equal($(allUsers[2]).text().trim(), 'Inactive Imogen');
+
+    assert.equal($(html).find('.group-name').text().trim(), 'groupName');
+    assert.equal($(html).find('.group-description').text().trim(), 'groupDescription');
 }());
 
 (function user_info_popover() {

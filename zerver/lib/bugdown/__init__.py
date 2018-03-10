@@ -1362,9 +1362,7 @@ class UserMentionPattern(markdown.inlinepatterns.Pattern):
             if match.startswith("**") and match.endswith("**"):
                 name = match[2:-2]
             else:
-                if not mention.user_mention_matches_wildcard(match):
-                    return None
-                name = match
+                return None
 
             wildcard = mention.user_mention_matches_wildcard(name)
             user = db_data['mention_data'].get_user(name)
@@ -1527,6 +1525,12 @@ class Bugdown(markdown.Extension):
             "backtick",
             BacktickPattern(r'(?:(?<!\\)((?:\\{2})+)(?=`+)|(?<!\\)(`+)(.+?)(?<!`)\3(?!`))'),
             "_begin")
+
+        md.inlinePatterns.add(
+            'strong_em',
+            markdown.inlinepatterns.DoubleTagPattern(
+                r'(\*\*\*)(?!\s+)([^\*^\n]+)(?<!\s)\*\*\*', 'strong,em'),
+            '>backtick')
 
         # Custom bold syntax: **foo** but not __foo__
         md.inlinePatterns.add('strong',
